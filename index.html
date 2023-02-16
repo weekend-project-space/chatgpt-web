@@ -1,0 +1,74 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+        <title>ChatGPT 在线体验 </title>
+        <style>
+            #output_text{
+                background: #eee;
+                padding: 15px;
+                border-radius: 5px;
+            }
+            .chatgpt-config{
+                position:fixed;
+                bottom: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <form id="chatgpt-form">
+                <div class="form-group  mt-3">
+                    <label> 向 ChatGPT 提问:</label>
+                    <textarea class="form-control mt-3" id="input_text" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3"> 发送 </button>
+                <div class="form-group mt-3">
+                    <div id="output_text"></div>
+                </div>
+            </form>
+
+            <div class="form-group chatgpt-config">
+                <label for="">chatgpt api key:</label>
+                <input id="api_key" type="text" placeholder="请填写你的chatgpt api key" class="form-control mt-3" value="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">
+            </div>
+            
+        </div>
+    </body>
+    <script>
+        document.getElementById('chatgpt-form').addEventListener('submit', submitForm);
+
+        function submitForm(event) {event.preventDefault();
+           
+            const apiKey = document.getElementById('api_key').value; // 填写 chatgpt api key
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://api.openai.com/v1/completions", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("Authorization", `Bearer ${apiKey}`);
+
+            xhr.onreadystatechange = function() {
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    document.getElementById("output_text").innerText = JSON.parse(this.responseText).choices[0].text.trim();
+                }else{
+                    document.getElementById("output_text").innerText = '这会有点累了，等会再问吧';
+                }
+            };
+
+            // 这里填写你的参数
+
+            var data = JSON.stringify({
+                prompt: document.getElementById("input_text").value,
+                max_tokens: 200,
+                temperature: 0.3,
+                n: 1,
+                stop: "",
+                model: 'text-davinci-003'
+            });
+
+            xhr.send(data);
+            document.getElementById('output_text').innerText = " 请稍等， 正在思考中...";
+        }
+    </script>
+</html>
